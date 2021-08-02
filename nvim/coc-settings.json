@@ -1,0 +1,50 @@
+{
+  "coc.preferences.formatOnSaveFiletypes": [
+    "css",
+    "markdown",
+    "javascript",
+    "graphql",
+    "html",
+    "yaml",
+    "json",
+    "python",
+    //"c",
+    "cpp"
+  ],
+  // python config
+  "python.linting.enabled": true,
+  "python.linting.pylintEnabled": true,
+  "snippets.ultisnips.directories": [
+    "UltiSnips",
+    "~/.config/nvim/utils/snips"
+  ],
+  "languageserver": {
+    "clangd": {
+      "command": "clangd",
+      "rootPatterns": [
+        "compile_flags.txt",
+        "compile_commands.json"
+      ],
+      "filetypes": [
+        "c",
+        "cc",
+        "cpp",
+        "c++",
+        "objc",
+        "objcpp"
+      ]
+    },
+    "bash": {
+      "command": "bash-language-server",
+      "args": [
+        "start"
+      ],
+      "filetypes": [
+        "sh"
+      ],
+      "ignoredRootPaths": [
+        "~"
+      ]
+    }
+  }
+}
