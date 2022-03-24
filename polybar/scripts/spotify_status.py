@@ -1,8 +1,9 @@
-#!/usr/bin/env python
+#!/bin/python
 
 import sys
 import dbus
 import argparse
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -37,16 +38,9 @@ parser.add_argument(
     metavar='the index of the font to use to display the playpause indicator',
     dest='play_pause_font'
 )
-parser.add_argument(
-    '-q',
-    '--quiet',
-    action='store_true',
-    help="if set, don't show any output when the current song is paused",
-    dest='quiet',
-)
+
 
 args = parser.parse_args()
-
 
 def fix_string(string):
     # corrects encoding for the python version used
@@ -55,27 +49,14 @@ def fix_string(string):
     else:
         return string.encode('utf-8')
 
-
-def truncate(name, trunclen):
-    if len(name) > trunclen:
-        name = name[:trunclen]
-        name += '...'
-        if ('(' in name) and (')' not in name):
-            name += ')'
-    return name
-
-
-
 # Default parameters
 output = fix_string(u'{play_pause} {artist}: {song}')
-trunclen = 50
+trunclen = 25
 play_pause = fix_string(u'\u25B6,\u23F8') # first character is play, second is paused
 
 label_with_font = '%{{T{font}}}{label}%{{T-}}'
 font = args.font
 play_pause_font = args.play_pause_font
-
-quiet = args.quiet
 
 # parameters can be overwritten by args
 if args.trunclen is not None:
@@ -118,21 +99,21 @@ try:
 
     artist = fix_string(metadata['xesam:artist'][0]) if metadata['xesam:artist'] else ''
     song = fix_string(metadata['xesam:title']) if metadata['xesam:title'] else ''
-    album = fix_string(metadata['xesam:album']) if metadata['xesam:album'] else ''
 
-    if (quiet and status == 'Paused') or (not artist and not song and not album):
+    if not artist and not song:
         print('')
     else:
+        if len(song) > trunclen:
+            song = song[0:trunclen]
+            song += '...'
+            if ('(' in song) and (')' not in song):
+                song += ')'
+
         if font:
             artist = label_with_font.format(font=font, label=artist)
             song = label_with_font.format(font=font, label=song)
-            album = label_with_font.format(font=font, label=album)
 
-        # Add 4 to trunclen to account for status symbol, spaces, and other padding characters
-        print(truncate(output.format(artist=artist, 
-                                     song=song, 
-                                     play_pause=play_pause, 
-                                     album=album), trunclen + 4))
+        print(output.format(artist=artist, song=song, play_pause=play_pause))
 
 except Exception as e:
     if isinstance(e, dbus.exceptions.DBusException):
